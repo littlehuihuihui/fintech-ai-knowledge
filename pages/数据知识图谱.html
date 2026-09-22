@@ -11,6 +11,14 @@
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
+  <!-- 课程数据内嵌（file:// 协议下无需 fetch，直接挂载到 window.__KG_EMBEDDED） -->
+  <script src="kg-data/embed-sql.js"></script>
+  <script src="kg-data/embed-python.js"></script>
+  <script src="kg-data/embed-database.js"></script>
+  <script src="kg-data/embed-ml.js"></script>
+  <script src="kg-data/embed-etl.js"></script>
+  <script src="kg-data/embed-dwh.js"></script>
+  <script src="kg-data/embed-bi.js"></script>
   <style>
     :root {
       --bg: #070b16;
@@ -874,10 +882,12 @@
       pointer-events: none !important;
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node circle {
-      stroke: #c4b5fd;
-      stroke-width: 1.8;
-      fill: #7c3aed !important;
-      filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.75));
+      stroke: var(--hub-bright, #c4b5fd);
+      stroke-width: 2;
+      fill: var(--hub-core, #7c3aed) !important;
+      filter:
+        drop-shadow(0 0 18px var(--hub-glow, rgba(168,85,247,0.75)))
+        drop-shadow(0 0 36px var(--hub-glow, rgba(168,85,247,0.3))) !important;
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node text {
       font-size: 13px !important;
@@ -885,8 +895,8 @@
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node .sublabel {
       font-size: 10px !important;
-      fill: #c4b5fd;
-      opacity: 1 !important;
+      fill: var(--hub-bright, #c4b5fd);
+      opacity: 0.9 !important;
     }
     body.home-hero:not(.kg-focus-on) .toolbar { opacity: 0.35; }
 
@@ -1182,36 +1192,73 @@
     }
 
 
-    /* 科技感：中心核 + 连线 */
+    /* 科技感：中心核 + 连线（首页节点差异化配色，通过 data-theme 控制） */
     .node.home-hero-node circle,
     .node.kg-focus-hub circle {
-      fill: url(#hubCoreGrad) !important;
-      stroke: #c4b5fd !important;
-      stroke-width: 1.6 !important;
-      filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.7));
+      fill: var(--hub-core, #7c3aed) !important;
+      stroke: var(--hub-bright, #c4b5fd) !important;
+      stroke-width: 2 !important;
+      filter:
+        drop-shadow(0 0 14px var(--hub-glow, rgba(168,85,247,0.65)))
+        drop-shadow(0 0 28px rgba(46, 230, 255, 0.18)) !important;
     }
+    .node.home-hero-node[data-theme="sql"]    { --hub-core:#22d3ee; --hub-bright:#a5f3fc; --hub-dark:#0e7490; --hub-glow:rgba(34,211,238,0.6); }
+    .node.home-hero-node[data-theme="python"] { --hub-core:#60a5fa; --hub-bright:#bfdbfe; --hub-dark:#1d4ed8; --hub-glow:rgba(96,165,250,0.6); }
+    .node.home-hero-node[data-theme="database"] { --hub-core:#34d399; --hub-bright:#a7f3d0; --hub-dark:#047857; --hub-glow:rgba(52,211,153,0.6); }
+    .node.home-hero-node[data-theme="ml"]     { --hub-core:#a78bfa; --hub-bright:#ddd6fe; --hub-dark:#6d28d9; --hub-glow:rgba(167,139,250,0.6); }
+    .node.home-hero-node[data-theme="etl"]    { --hub-core:#fbbf24; --hub-bright:#fde68a; --hub-dark:#b45309; --hub-glow:rgba(251,191,36,0.6); }
+    .node.home-hero-node[data-theme="dwh"]    { --hub-core:#f472b6; --hub-bright:#fbcfe8; --hub-dark:#be185d; --hub-glow:rgba(244,114,182,0.6); }
+    .node.home-hero-node[data-theme="bi"]     { --hub-core:#2dd4bf; --hub-bright:#99f6e4; --hub-dark:#0f766e; --hub-glow:rgba(45,212,191,0.6); }
     .hub-ring {
-      stroke: rgba(168, 85, 247, 0.45);
-      stroke-width: 1.2;
+      stroke: var(--hub-core, rgba(168,85,247,0.5));
+      stroke-opacity: 0.5;
+      stroke-width: 1.4;
+      fill: none;
       pointer-events: none;
     }
     .hub-ring-dash {
-      stroke: rgba(34, 211, 238, 0.55);
-      stroke-width: 1;
-      stroke-dasharray: 3 7;
+      stroke: var(--hub-bright, rgba(34,211,238,0.6));
+      stroke-width: 1.2;
+      stroke-dasharray: 4 8;
+      fill: none;
       pointer-events: none;
-      animation: hubSpin 12s linear infinite;
+      animation: hubSpin 14s linear infinite;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+    .hub-ring-outer {
+      stroke: var(--hub-core, rgba(168,85,247,0.3));
+      stroke-opacity: 0.25;
+      stroke-width: 1;
+      stroke-dasharray: 2 10;
+      fill: none;
+      pointer-events: none;
+      animation: hubSpin 22s linear infinite reverse;
       transform-origin: center;
       transform-box: fill-box;
     }
     @keyframes hubSpin {
       to { stroke-dashoffset: -120; }
     }
+    @keyframes hubBreathe {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+    .node.home-hero-node .hub-glow {
+      fill: var(--hub-core, #a78bfa);
+      opacity: 0.12;
+      pointer-events: none;
+      animation: hubBreathe 3.5s ease-in-out infinite;
+      transform-origin: center;
+      transform-box: fill-box;
+    }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node circle {
-      stroke: #c4b5fd !important;
-      stroke-width: 1.8 !important;
-      fill: #7c3aed !important;
-      filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.75));
+      stroke: var(--hub-bright, #c4b5fd) !important;
+      stroke-width: 2 !important;
+      fill: var(--hub-core, #7c3aed) !important;
+      filter:
+        drop-shadow(0 0 18px var(--hub-glow, rgba(168,85,247,0.75)))
+        drop-shadow(0 0 36px var(--hub-glow, rgba(168,85,247,0.35))) !important;
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node text {
       font-size: 13px !important;
@@ -1400,11 +1447,11 @@
       to { opacity: 1; }
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node circle {
-      stroke: #d8b4fe !important;
-      stroke-width: 1.5 !important;
+      stroke: var(--hub-bright, #d8b4fe) !important;
+      stroke-width: 2 !important;
       filter:
-        drop-shadow(0 0 16px rgba(168, 85, 247, 0.7))
-        drop-shadow(0 0 34px rgba(46, 230, 255, 0.28)) !important;
+        drop-shadow(0 0 18px var(--hub-glow, rgba(168,85,247,0.7)))
+        drop-shadow(0 0 36px var(--hub-glow, rgba(168,85,247,0.35))) !important;
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node text {
       font-family: var(--font-display) !important;
@@ -1414,8 +1461,9 @@
     }
     body.home-hero:not(.kg-focus-on) .node.home-hero-node .sublabel {
       font-size: 10px !important;
-      fill: #a5b4fc !important;
+      fill: var(--hub-bright, #a5b4fc) !important;
       letter-spacing: 0.06em;
+      opacity: 0.9;
     }
     .toolbar button {
       border-radius: 8px;
@@ -2485,13 +2533,6 @@
     }
 
     </style>
-  <script src="kg-data/embed-sql.js"></script>
-  <script src="kg-data/embed-python.js"></script>
-  <script src="kg-data/embed-database.js"></script>
-  <script src="kg-data/embed-ml.js"></script>
-  <script src="kg-data/embed-etl.js"></script>
-  <script src="kg-data/embed-dwh.js"></script>
-  <script src="kg-data/embed-bi.js"></script>
 </head>
 <body>
   <header>
@@ -2500,7 +2541,7 @@
       <div class="brand-mark" aria-hidden="true"></div>
       <div class="brand-copy">
         <h1><span class="mono-prefix">&gt;_</span>DATA NEXUS</h1>
-        <span class="brand-tag">学习路径 · 点击中心节点展开知识树</span>
+        <span class="brand-tag">点击中心节点展开知识树</span>
       </div>
     </div>
     <div class="legend" id="legend"></div>
@@ -2595,6 +2636,16 @@
       etl: "集成与调度",
       dwh: "分层与建模",
       bi: "指标与看板"
+    };
+    /** 首页学科大节点专属配色（核心色 / 亮色 / 暗色 / 光晕色） */
+    const HUB_THEME = {
+      sql:      { core: "#22d3ee", bright: "#a5f3fc", dark: "#0e7490", glow: "rgba(34,211,238,0.55)", icon: "SQL" },
+      python:   { core: "#60a5fa", bright: "#bfdbfe", dark: "#1d4ed8", glow: "rgba(96,165,250,0.55)", icon: "Py" },
+      database: { core: "#34d399", bright: "#a7f3d0", dark: "#047857", glow: "rgba(52,211,153,0.55)", icon: "DB" },
+      ml:       { core: "#a78bfa", bright: "#ddd6fe", dark: "#6d28d9", glow: "rgba(167,139,250,0.55)", icon: "ML" },
+      etl:      { core: "#fbbf24", bright: "#fde68a", dark: "#b45309", glow: "rgba(251,191,36,0.55)", icon: "ETL" },
+      dwh:      { core: "#f472b6", bright: "#fbcfe8", dark: "#be185d", glow: "rgba(244,114,182,0.55)", icon: "DWH" },
+      bi:       { core: "#2dd4bf", bright: "#99f6e4", dark: "#0f766e", glow: "rgba(45,212,191,0.55)", icon: "BI" }
     };
 
     const COMPARE_FIELDS = [
@@ -9241,7 +9292,7 @@
 };
 
     /* —— 课树懒加载：首屏不内联 7 棵大树，进入学科时再 fetch —— */
-    const KG_DATA_VER = "20260921f";
+    const KG_DATA_VER = "20260922c";
     const KG_TREE_FILES = {
       sql: "kg-data/hub-query.json?v=" + KG_DATA_VER,
       python: "kg-data/hub-python.json?v=" + KG_DATA_VER,
@@ -9830,6 +9881,8 @@
     const satLinkG = gRoot.append("g").attr("class", "sat-links");
     const satSparkG = gRoot.append("g").attr("class", "sat-sparks");
     const satNodeG = gRoot.append("g").attr("class", "sat-nodes");
+    const heroLinkG = gRoot.append("g").attr("class", "hero-links");
+    const heroCoreG = gRoot.append("g").attr("class", "hero-core");
     const laneG = gRoot.append("g").attr("class", "lanes");
     let expandedHubId = null;
     let satData = [];
@@ -9965,11 +10018,34 @@
         .on("drag", (event, d) => { d.x = d.fx = event.x; d.y = d.fy = event.y; tick(); }));
 
     node.classed("home-hero-node", d => (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID));
+    node.attr("data-theme", d => {
+      const isHero = (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID);
+      return isHero ? d.id : null;
+    });
+    /* 首页大节点：外层光晕 + 三层装饰环 */
+    node.filter(function(d) {
+      return HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID);
+    }).each(function(d) {
+      const g = d3.select(this);
+      const theme = (typeof HUB_THEME !== "undefined" && HUB_THEME[d.id]) ? HUB_THEME[d.id] : { core:"#a78bfa", bright:"#ddd6fe" };
+      // 底部大光晕
+      g.append("circle").attr("class", "hub-glow").attr("r", 68);
+      // 最外环（反向旋转虚线）
+      g.append("circle").attr("class", "hub-ring-outer").attr("r", 56);
+      // 中环（正向旋转虚线）
+      g.append("circle").attr("class", "hub-ring-dash").attr("r", 50);
+      // 内实线环
+      g.append("circle").attr("class", "hub-ring").attr("r", 45);
+    });
     node.append("circle").attr("r", d => {
         if (HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID)) return 40;
         return d.catalog ? 32 : 26;
       })
-      .attr("fill", d => CATEGORIES[d.category].color)
+      .attr("fill", d => {
+        const isHero = HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID);
+        if (isHero && typeof HUB_THEME !== "undefined" && HUB_THEME[d.id]) return HUB_THEME[d.id].core;
+        return CATEGORIES[d.category].color;
+      })
       .attr("filter", "url(#node-glow)");
     node.append("text")
       .style("font-size", d => (HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID)) ? "12px" : (d.catalog ? "12px" : "11px"))
@@ -9985,6 +10061,126 @@
         return d.catalog ? "点击展开" : (d.name.length > 5 ? d.name : "");
       });
     if (HOME_HERO_ONLY) document.body.classList.add("home-hero");
+
+    /* —— 首页学科环：节点间弧形连线 + 中心核心装饰 —— */
+    function drawHeroConnections() {
+      if (!HOME_HERO_ONLY || (kgDrill && kgDrill.active)) { heroLinkG.selectAll("*").remove(); heroCoreG.selectAll("*").remove(); return; }
+      const hubs = (typeof HOME_HERO_HUBS !== "undefined" && HOME_HERO_HUBS.length) ? HOME_HERO_HUBS : [HOME_HUB_ID];
+      const hubNodes = nodes.filter(n => hubs.includes(n.id));
+      if (hubNodes.length < 2) return;
+      const cx = width() / 2, cy = height() / 2;
+
+      // 中心核心：多层脉冲环 + 中心光点
+      heroCoreG.selectAll("*").remove();
+      if (!defs.select("#heroCoreGrad").size()) {
+        const coreGrad = defs.append("radialGradient").attr("id", "heroCoreGrad");
+        coreGrad.append("stop").attr("offset", "0%").attr("stop-color", "#fff").attr("stop-opacity", 0.9);
+        coreGrad.append("stop").attr("offset", "40%").attr("stop-color", "#22d3ee").attr("stop-opacity", 0.4);
+        coreGrad.append("stop").attr("offset", "100%").attr("stop-color", "#22d3ee").attr("stop-opacity", 0);
+      }
+      [0, 1, 2].forEach(i => {
+        heroCoreG.append("circle")
+          .attr("class", "hero-pulse-ring")
+          .attr("cx", cx).attr("cy", cy).attr("r", 30 + i * 18)
+          .attr("fill", "none")
+          .attr("stroke", "#22d3ee")
+          .attr("stroke-width", 1)
+          .attr("stroke-opacity", 0.3 - i * 0.08)
+          .style("animation", `heroPulse 3.5s ease-out ${i * 1.1}s infinite`);
+      });
+      heroCoreG.append("circle").attr("cx", cx).attr("cy", cy).attr("r", 6)
+        .attr("fill", "url(#heroCoreGrad)")
+        .attr("filter", "drop-shadow(0 0 12px rgba(34,211,238,0.8))");
+      heroCoreG.append("circle").attr("cx", cx).attr("cy", cy).attr("r", 2.5)
+        .attr("fill", "#fff")
+        .attr("filter", "drop-shadow(0 0 6px rgba(255,255,255,0.9))");
+
+      // 节点间弧形连线
+      heroLinkG.selectAll("*").remove();
+      const n = hubNodes.length;
+      const linkPaths = [];
+      for (let i = 0; i < n; i++) {
+        linkPaths.push({ source: hubNodes[i], target: hubNodes[(i + 1) % n], type: "adjacent" });
+      }
+      for (let i = 0; i < n; i++) {
+        linkPaths.push({ source: hubNodes[i], target: hubNodes[(i + 2) % n], type: "skip" });
+      }
+      hubNodes.forEach(hn => {
+        linkPaths.push({ source: { x: cx, y: cy }, target: hn, type: "spoke", theme: hn.id });
+      });
+
+      heroLinkG.selectAll("path").data(linkPaths).join("path")
+        .attr("class", d => `hero-link ${d.type}`)
+        .attr("d", d => {
+          const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y;
+          const dx = tx - sx, dy = ty - sy;
+          const dist = Math.hypot(dx, dy) || 1;
+          const pad = d.type === "spoke" ? 12 : 48;
+          const x2 = tx - (dx / dist) * pad, y2 = ty - (dy / dist) * pad;
+          const x1 = d.type === "spoke" ? sx + (dx / dist) * 10 : sx + (dx / dist) * pad;
+          const y1 = d.type === "spoke" ? sy + (dy / dist) * 10 : sy + (dy / dist) * pad;
+          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+          const nx = -dy / dist, ny = dx / dist;
+          const bend = d.type === "spoke" ? 0 : (d.type === "adjacent" ? dist * 0.18 : dist * 0.1);
+          return `M${x1},${y1}Q${mx + nx * bend},${my + ny * bend} ${x2},${y2}`;
+        })
+        .attr("stroke", d => {
+          if (d.type === "spoke" && typeof HUB_THEME !== "undefined" && HUB_THEME[d.theme]) return HUB_THEME[d.theme].core;
+          return "#22d3ee";
+        })
+        .attr("stroke-opacity", d => d.type === "spoke" ? 0.22 : (d.type === "adjacent" ? 0.32 : 0.15))
+        .attr("stroke-width", d => d.type === "spoke" ? 1 : (d.type === "adjacent" ? 1.4 : 1))
+        .attr("fill", "none")
+        .attr("stroke-dasharray", d => d.type === "skip" ? "3 6" : "none")
+        .attr("stroke-linecap", "round")
+        .style("filter", d => d.type === "adjacent" ? "drop-shadow(0 0 3px rgba(34,211,238,0.3))" : "none");
+
+      // 连线上的流动粒子
+      const particleLinks = linkPaths.filter(d => d.type !== "skip");
+      heroLinkG.selectAll("circle.hero-particle")
+        .data(particleLinks).join("circle")
+        .attr("class", "hero-particle")
+        .attr("r", d => d.type === "spoke" ? 1.5 : 2)
+        .attr("fill", d => {
+          if (d.type === "spoke" && typeof HUB_THEME !== "undefined" && HUB_THEME[d.theme]) return HUB_THEME[d.theme].bright;
+          return "#a5f3fc";
+        })
+        .attr("filter", "drop-shadow(0 0 4px rgba(34,211,238,0.8))")
+        .style("animation", (d, i) => `heroFlow ${2.5 + (i % 3) * 0.8}s linear ${i * 0.3}s infinite`)
+        .style("offset-path", d => {
+          const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y;
+          const dx = tx - sx, dy = ty - sy;
+          const dist = Math.hypot(dx, dy) || 1;
+          const pad = d.type === "spoke" ? 12 : 48;
+          const x2 = tx - (dx / dist) * pad, y2 = ty - (dy / dist) * pad;
+          const x1 = d.type === "spoke" ? sx + (dx / dist) * 10 : sx + (dx / dist) * pad;
+          const y1 = d.type === "spoke" ? sy + (dy / dist) * 10 : sy + (dy / dist) * pad;
+          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+          const nx = -dy / dist, ny = dx / dist;
+          const bend = d.type === "spoke" ? 0 : (d.type === "adjacent" ? dist * 0.18 : dist * 0.1);
+          return `path('M${x1},${y1}Q${mx + nx * bend},${my + ny * bend} ${x2},${y2}')`;
+        });
+    }
+    (function injectHeroAnimations() {
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes heroPulse {
+          0% { transform: scale(0.6); opacity: 0.6; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+        @keyframes heroFlow {
+          0% { offset-distance: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { offset-distance: 100%; opacity: 0; }
+        }
+        .hero-pulse-ring { transform-origin: center; transform-box: fill-box; }
+        body.kg-focus-on .hero-links, body.kg-focus-on .hero-core { opacity: 0; pointer-events: none; }
+      `;
+      document.head.appendChild(style);
+    })();
+    drawHeroConnections();
+    window.addEventListener("resize", () => { setTimeout(drawHeroConnections, 100); });
 
     function shortLabel(name) {
       const map = {
