@@ -2541,7 +2541,7 @@
       <div class="brand-mark" aria-hidden="true"></div>
       <div class="brand-copy">
         <h1><span class="mono-prefix">&gt;_</span>DATA NEXUS</h1>
-        <span class="brand-tag">点击中心节点展开知识树</span>
+        <span class="brand-tag">学习路径 · 点击中心节点展开知识树</span>
       </div>
     </div>
     <div class="legend" id="legend"></div>
@@ -9292,7 +9292,7 @@
 };
 
     /* —— 课树懒加载：首屏不内联 7 棵大树，进入学科时再 fetch —— */
-    const KG_DATA_VER = "20260922c";
+    const KG_DATA_VER = "20260922e";
     const KG_TREE_FILES = {
       sql: "kg-data/hub-query.json?v=" + KG_DATA_VER,
       python: "kg-data/hub-python.json?v=" + KG_DATA_VER,
@@ -10014,6 +10014,7 @@
       .attr("transform", d => `translate(${d.x},${d.y})`)
       .classed("learned", d => isLearned(d.id))
       .call(d3.drag()
+        .clickDistance(10)
         .on("start", (event) => event.sourceEvent.stopPropagation())
         .on("drag", (event, d) => { d.x = d.fx = event.x; d.y = d.fy = event.y; tick(); }));
 
@@ -10022,20 +10023,13 @@
       const isHero = (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID);
       return isHero ? d.id : null;
     });
-    /* 首页大节点：外层光晕 + 三层装饰环 */
+    /* 首页大节点：外层光晕（ellipse避免被node.select("circle")选中） */
     node.filter(function(d) {
       return HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID);
     }).each(function(d) {
       const g = d3.select(this);
-      const theme = (typeof HUB_THEME !== "undefined" && HUB_THEME[d.id]) ? HUB_THEME[d.id] : { core:"#a78bfa", bright:"#ddd6fe" };
-      // 底部大光晕
-      g.append("circle").attr("class", "hub-glow").attr("r", 68);
-      // 最外环（反向旋转虚线）
-      g.append("circle").attr("class", "hub-ring-outer").attr("r", 56);
-      // 中环（正向旋转虚线）
-      g.append("circle").attr("class", "hub-ring-dash").attr("r", 50);
-      // 内实线环
-      g.append("circle").attr("class", "hub-ring").attr("r", 45);
+      // 底部大光晕（用ellipse，避免被node.select("circle")选中）
+      g.append("ellipse").attr("class", "hub-glow").attr("rx", 68).attr("ry", 68);
     });
     node.append("circle").attr("r", d => {
         if (HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID)) return 40;
@@ -10047,6 +10041,18 @@
         return CATEGORIES[d.category].color;
       })
       .attr("filter", "url(#node-glow)");
+    /* 首页大节点：三层装饰环（放在主圆之后，绘制在上方） */
+    node.filter(function(d) {
+      return HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID);
+    }).each(function(d) {
+      const g = d3.select(this);
+      // 内实线环
+      g.append("circle").attr("class", "hub-ring").attr("r", 45);
+      // 中环（正向旋转虚线）
+      g.append("circle").attr("class", "hub-ring-dash").attr("r", 50);
+      // 最外环（反向旋转虚线）
+      g.append("circle").attr("class", "hub-ring-outer").attr("r", 56);
+    });
     node.append("text")
       .style("font-size", d => (HOME_HERO_ONLY && (typeof HOME_HERO_HUBS !== "undefined" ? HOME_HERO_HUBS.includes(d.id) : d.id === HOME_HUB_ID)) ? "12px" : (d.catalog ? "12px" : "11px"))
       .text(d => shortLabel(d.name));
@@ -12382,7 +12388,8 @@
     node.on("click", (event, d) => {
       event.stopPropagation();
       panelState = { mode: "overview", engineId: null, compareOn: false, compareIds: [] };
-      if ((typeof hasKgCurriculum === 'function' ? hasKgCurriculum(d.id) : KG_TREES[d.id])) {
+      const _hasKg = !!(KG_TREE_FILES[d.id] || KG_TREES[d.id] || (typeof hasKgCurriculum === 'function' && hasKgCurriculum(d.id)));
+      if (_hasKg) {
         // 行业百科式：进入焦点即展开三扇区（知识图谱），不打开引擎目录弹窗
         selectedId = d.id;
         const related = neighbors[d.id] || new Set();
