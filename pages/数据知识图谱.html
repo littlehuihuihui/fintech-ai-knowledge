@@ -928,6 +928,25 @@
     body {
       background-color: #0a0e1a !important;
     }
+  /* 下钻弹性展开动画 */
+    .node.kg-pop-in {
+      animation: kgPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes kgPopIn {
+      0% { transform: scale(0.3) translate(var(--pop-cx, 0), var(--pop-cy, 0)); opacity: 0; }
+      55% { transform: scale(1.12); opacity: 1; }
+      75% { transform: scale(0.96); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    /* 连线弹性延伸 */
+    .link.kg-link-draw {
+      stroke-dasharray: 1000;
+      animation: linkDrawIn 0.8s ease-out both;
+    }
+    @keyframes linkDrawIn {
+      from { stroke-dashoffset: 1000; opacity: 0; }
+      to { stroke-dashoffset: 0; opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -8978,8 +8997,8 @@
         heroLinkG.append("path")
           .attr("d", `M${a.x},${a.y} Q${cpx},${cpy} ${b.x},${b.y}`)
           .attr("fill", "none")
-          .attr("stroke", "rgba(34,211,238,0.18)")
-          .attr("stroke-width", 1.2)
+          .attr("stroke", "rgba(148,163,184,0.25)")
+          .attr("stroke-width", 1.5)
           .attr("class", "hero-link adjacent");
       }
       // 隔位节点连线（虚线）
@@ -9010,9 +9029,13 @@
       });
       // 中心核心光晕
       heroLinkG.append("circle")
-        .attr("cx", cx).attr("cy", cy).attr("r", 60)
-        .attr("fill", "rgba(34,211,238,0.04)")
+        .attr("cx", cx).attr("cy", cy).attr("r", 80)
+        .attr("fill", "rgba(148,163,184,0.06)")
         .attr("class", "hero-core-glow");
+      heroLinkG.append("circle")
+        .attr("cx", cx).attr("cy", cy).attr("r", 45)
+        .attr("fill", "rgba(148,163,184,0.08)")
+        .attr("class", "hero-core-glow-inner");
       // 脉冲环
       for (let i = 0; i < 3; i++) {
         heroLinkG.append("circle")
@@ -9067,6 +9090,7 @@
     placeNodes();
     drawHeroConnections();
     drawStages(layoutMetrics());
+    
     
 
     const link = linkG.selectAll("path").data(links).join("path")
@@ -9507,6 +9531,9 @@
             updateKgDrillHint();
             syncKgHubSize();
             if (typeof tick === "function") tick();
+            // 弹性展开动画
+            node.classed("kg-pop-in", true);
+            setTimeout(() => node.classed("kg-pop-in", false), 700);
           };
           if (typeof requestAnimationFrame === "function") {
             requestAnimationFrame(() => requestAnimationFrame(finishEnter));
